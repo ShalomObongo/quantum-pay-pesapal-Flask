@@ -3,7 +3,7 @@
 A modern, secure payment integration system for processing payments through Pesapal's payment gateway. This implementation provides a seamless payment experience with support for multiple payment methods including M-Pesa and Card Payments, featuring a sleek and responsive user interface.
 
 <div align="center">
-    <img src="https://www.pesapal.com/pesapal-logos-pantone" alt="Pesapal Logo" width="200"/>
+    <img src="https://www.pesapal.com/media/117786/pesapal_logo_and_slogan_outlined-01.png?anchor=center&mode=crop&width=770&height=375&rnd=133316248260000000" alt="Pesapal Logo" width="200"/>
 </div>
 
 ## ✨ Features
