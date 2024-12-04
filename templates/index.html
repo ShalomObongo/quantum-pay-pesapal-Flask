@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Pay Pesapal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6d28d9;
+            --primary-dark: #4c1d95;
+            --secondary-color: #2563eb;
+            --accent-color: #8b5cf6;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.95);
+            --input-bg: rgba(15, 23, 42, 0.8);
+            --gradient-start: #4c1d95;
+            --gradient-end: #1e40af;
+            --border-color: rgba(148, 163, 184, 0.1);
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--text-color);
+            position: relative;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="rgba(255,255,255,0.03)" x="0" y="0" width="100" height="100"/></svg>') repeat;
+            background-size: 30px 30px;
+            animation: backgroundMove 20s linear infinite;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        @keyframes backgroundMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 60px 60px; }
+        }
+
+        .page-container {
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 3rem;
+            padding: 2rem 1rem;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(109, 40, 217, 0.5);
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #e2e8f0, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .payment-form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .payment-form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
+        }
+        
+        .form-control {
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+            background: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+        
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+            background: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: buttonShine 3s infinite;
+        }
+
+        @keyframes buttonShine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+        
+        .currency-label {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        
+        .amount-input {
+            padding-left: 3.5rem;
+        }
+        
+        .amount-wrapper {
+            position: relative;
+        }
+        
+        .form-check {
+            padding: 1rem;
+            background: var(--input-bg);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+        
+        .form-check:hover {
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .developer-signature {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card-bg);
+            padding: 8px 16px;
+            border-radius: 50px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .developer-signature:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(139, 92, 246, 0.2);
+        }
+
+        .profile-pic {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--accent-color);
+        }
+
+        .profile-pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--text-color);
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
+            border-color: var(--accent-color);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+            background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .quantum-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 2rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            font-size: 0.875rem;
+            color: var(--accent-color);
+        }
+
+        .quantum-badge i {
+            font-size: 0.75rem;
+        }
+
+        [data-theme="light"] {
+            --primary-color: #6d28d9;
+            --primary-dark: #4c1d95;
+            --secondary-color: #2563eb;
+            --accent-color: #8b5cf6;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --bg-color: #f3f4f6;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --input-bg: rgba(255, 255, 255, 0.8);
+            --border-color: rgba(107, 114, 128, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #6d28d9;
+            --primary-dark: #4c1d95;
+            --secondary-color: #2563eb;
+            --accent-color: #8b5cf6;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.95);
+            --input-bg: rgba(15, 23, 42, 0.8);
+            --border-color: rgba(148, 163, 184, 0.1);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-toggle i {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover i {
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 768px) {
+            .payment-form {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .developer-signature {
+                bottom: 10px;
+                right: 10px;
+                padding: 6px 12px;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+    </button>
+    <div class="page-container">
+        <header class="header">
+            <div class="quantum-badge">
+                <i class="fas fa-atom fa-spin"></i>
+                Quantum Technology
+            </div>
+            <h1>Quantum Pay Pesapal</h1>
+            <p>Experience the future of payments with our quantum-powered gateway. Seamlessly process transactions with state-of-the-art security and lightning-fast speeds.</p>
+        </header>
+
+        <div class="container">
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Quantum Security</h3>
+                    <p>Advanced encryption and security measures to protect your transactions at the quantum level.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>Lightning Fast</h3>
+                    <p>Process payments at quantum speeds with our optimized payment infrastructure.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Universal Access</h3>
+                    <p>Pay from any device, anywhere, with our quantum-responsive interface.</p>
+                </div>
+            </div>
+
+            <div class="payment-form">
+                <h2 class="text-center mb-4">Make Payment</h2>
+                <form id="paymentForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" name="firstName" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" name="lastName" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone" class="form-label">Phone Number (e.g., 254712345678)</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" 
+                               pattern="^254[0-9]{9}$" 
+                               placeholder="254XXXXXXXXX" required>
+                        <small class="form-text text-muted">Enter phone number starting with 254</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount" class="form-label">Amount</label>
+                        <div class="amount-wrapper">
+                            <span class="currency-label">KES</span>
+                            <input type="number" class="form-control amount-input" id="amount" 
+                                   name="amount" required min="1" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description" class="form-label">Payment Description</label>
+                        <textarea class="form-control" id="description" name="description" 
+                                  rows="2" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="enableRecurring" name="enableRecurring">
+                            <label class="form-check-label" for="enableRecurring">
+                                Enable Recurring Payment
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="recurringOptions" style="display: none;">
+                        <div class="form-group">
+                            <label for="accountNumber" class="form-label">Account/Invoice Number</label>
+                            <input type="text" class="form-control" id="accountNumber" name="accountNumber" 
+                                   placeholder="e.g., ACC-12345">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="frequency" class="form-label">Payment Frequency</label>
+                            <select class="form-control" id="frequency" name="frequency">
+                                <option value="DAILY">Daily</option>
+                                <option value="WEEKLY">Weekly</option>
+                                <option value="MONTHLY">Monthly</option>
+                                <option value="YEARLY">Yearly</option>
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="startDate" class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="startDate" name="startDate">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="endDate" class="form-label">End Date</label>
+                                    <input type="date" class="form-control" id="endDate" name="endDate">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Proceed to Payment</button>
+                </form>
+                <div id="error-message" class="alert alert-danger mt-3" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="developer-signature">
+            <div class="profile-pic">
+                <img src="https://shalomobongo.tech/public/ProfilePic.png" alt="Shalom Obongo" />
+            </div>
+            <span style="color: var(--text-color); font-size: 0.875rem;">
+                Developed by <span style="color: var(--accent-color); font-weight: 500;">Shalom</span>
+            </span>
+        </div>
+    </div>
+
+    <script>
+        // Toggle recurring payment fields
+        document.getElementById('enableRecurring').addEventListener('change', function(e) {
+            const recurringOptions = document.getElementById('recurringOptions');
+            recurringOptions.style.display = e.target.checked ? 'block' : 'none';
+            
+            // Update required attributes based on checkbox state
+            const fields = ['accountNumber', 'frequency', 'startDate', 'endDate'];
+            fields.forEach(field => {
+                const element = document.getElementById(field);
+                element.required = e.target.checked;
+                if (!e.target.checked) {
+                    element.value = '';  // Clear values when disabling
+                }
+            });
+        });
+
+        // Validate end date is after start date
+        document.getElementById('endDate').addEventListener('change', function(e) {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = e.target.value;
+            
+            if (startDate && endDate && new Date(endDate) <= new Date(startDate)) {
+                alert('End date must be after start date');
+                e.target.value = '';
+            }
+        });
+
+        document.getElementById('paymentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitButton = this.querySelector('button[type="submit"]');
+            const errorDiv = document.getElementById('error-message');
+            
+            try {
+                // Validate recurring payment fields
+                if (formData.get('enableRecurring')) {
+                    const startDate = formData.get('startDate');
+                    const endDate = formData.get('endDate');
+                    const accountNumber = formData.get('accountNumber');
+                    
+                    if (!startDate || !endDate || !accountNumber) {
+                        throw new Error('All recurring payment fields are required');
+                    }
+                    
+                    if (new Date(endDate) <= new Date(startDate)) {
+                        throw new Error('End date must be after start date');
+                    }
+
+                    // Format dates to Pesapal's required format
+                    formData.set('startDate', formatDate(startDate));
+                    formData.set('endDate', formatDate(endDate));
+                }
+
+                // Disable the submit button and show loading state
+                submitButton.disabled = true;
+                submitButton.innerHTML = 'Processing...';
+                errorDiv.style.display = 'none';
+                
+                // Convert FormData to URLSearchParams
+                const params = new URLSearchParams();
+                for (const [key, value] of formData.entries()) {
+                    params.append(key, value);
+                }
+                
+                const response = await fetch('/initiate-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: params.toString()
+                });
+
+                // Check if response is JSON (error) or HTML (payment page)
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data.error || 'An error occurred');
+                    }
+                } else {
+                    // If HTML response, replace the entire page content
+                    document.documentElement.innerHTML = await response.text();
+                    return;
+                }
+            } catch (error) {
+                errorDiv.textContent = error.message || 'An error occurred while connecting to the server';
+                errorDiv.style.display = 'block';
+                
+                // Reset button state
+                submitButton.disabled = false;
+                submitButton.innerHTML = 'Proceed to Payment';
+            }
+        });
+
+        // Format phone number as user types
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (!value.startsWith('254') && value.length > 0) {
+                value = '254' + value;
+            }
+            e.target.value = value;
+        });
+
+        // Format dates to Pesapal's required format (dd-MM-yyyy)
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
+
+        // Set minimum dates for start and end date inputs
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('startDate').min = today;
+        document.getElementById('endDate').min = today;
+        
+        // Ensure end date is after start date
+        document.getElementById('startDate').addEventListener('change', function(e) {
+            document.getElementById('endDate').min = e.target.value;
+        });
+
+        // Theme toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            const icon = themeToggle.querySelector('i');
+            
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+            
+            themeToggle.addEventListener('click', function() {
+                const currentTheme = document.body.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.body.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateThemeIcon(newTheme);
+            });
+            
+            function updateThemeIcon(theme) {
+                icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+            }
+        });
+    </script>
+</body>
+</html>
